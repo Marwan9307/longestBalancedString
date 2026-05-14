@@ -1,34 +1,67 @@
-#include<iostream>
+#include <iostream>
+#include <unordered_map>
+#include <algorithm>
 using namespace std;
 
-int getLongestBalancedSubstring(const string &s) {
-    int n = s.length(),  longestBalancedSubstring = 0;
+int longestBalanced(string s) {
 
-    for (int start = 0; start < n; start++) {
-        char c1 = 0, c2 = 0;
-        int countC1 = 0, countC2 = 0;
+    int maxLen = 0;
 
-        for (int end = start; end < n; end++) {
-            char currentChar = s[end];
+    for (char c1 = 'a'; c1 <= 'z'; c1++) {
 
-            if      (currentChar == c1)  countC1++;
-            else if (currentChar == c2)  countC2++;
-            else if (c1 == 0)  { c1 = currentChar; countC1++; }
-            else if (c2 == 0)  { c2 = currentChar; countC2++; }
-            else               break;   
+        for (char c2 = c1 + 1; c2 <= 'z'; c2++) {
 
-            if (c1 && c2 && countC1 == countC2)
-                longestBalancedSubstring = max(longestBalancedSubstring, end - start + 1);
+            unordered_map<int, int> firstIndex;
+
+            int prefix = 0;
+
+            firstIndex[0] = -1;
+
+            int lastBreak = -1;
+
+            for (int i = 0; i < s.size(); i++) {
+
+                if (s[i] == c1)
+                    prefix++;
+
+                else if (s[i] == c2)
+                    prefix--;
+
+                else {
+
+                    prefix = 0;
+
+                    firstIndex.clear();
+
+                    firstIndex[0] = i;
+
+                    continue;
+                }
+
+                if (firstIndex.count(prefix)) {
+
+                    maxLen = max(maxLen,
+                        i - firstIndex[prefix]);
+                }
+
+                else {
+
+                    firstIndex[prefix] = i;
+                }
+            }
         }
     }
-    return longestBalancedSubstring;
+
+    return maxLen;
 }
 
 int main() {
+
     string s;
+
     cin >> s;
-    cout << getLongestBalancedSubstring(s) << endl;
+
+    cout << longestBalanced(s);
+
     return 0;
 }
-
-
